@@ -40,7 +40,7 @@ INSTRUCTION(chop_Fx33); //store BCD representation of Vx in I, I+1, I+2 (take de
 INSTRUCTION(chop_Fx55); //store registers V0 through Vx in memory starting at location I
 INSTRUCTION(chop_Fx65); //read memory starting at location I into registers 0 through Vx
 
-INSTRUCTION(chop_NULL) {}
+INSTRUCTION(chop_NOP);
 
 void table0f(chip_8*);
 void table8f(chip_8*);
@@ -54,5 +54,7 @@ void (*tablee[16])(chip_8*);
 void (*tablef[102])(chip_8*);
 
 void initialize_optable();
+
+void decxec(chip_8*);
 
 #endif
