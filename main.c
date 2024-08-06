@@ -4,10 +4,13 @@
 #include <time.h>
 
 int main(int argc, char** argv) {
-	const char* fname = argv[1];
+	const char* videoScaleStr = argv[1];
+	const char* cycleDelayStr = argv[2];
+	const char* fname = argv[3];
 
-	int videoScale = 10;
-	int cycleDelay = 1;
+	char* _a;
+	int videoScale = (int)(strtol(videoScaleStr, &_a, 10));
+	int cycleDelay = (int)(strtol(cycleDelayStr, &_a, 10));
 	//printf("%i %i %s %s %s\n", videoScale, cycleDelay, argv[0], argv[1], fname);
 	
 	ch_video platform;
