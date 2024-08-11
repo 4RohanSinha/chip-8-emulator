@@ -14,7 +14,7 @@ ops.o: ops.c $(HEADERS)
 video.o: video.c $(HEADERS)
 	$(CC) $(CFLAGS) -c -o $@ video.c
 clean:
-	rm -rf chip8
+	rm -f chip8
 
 #chip8: chip8.c ops.c video.c main.c
 #	gcc $(CFLAGS) chip8.c ops.c video.c main.c -o chip8 $(LDFLAGS)
