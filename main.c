@@ -9,7 +9,15 @@ int main(int argc, char** argv) {
 	const char* cycleDelayStr = argv[2];
 	const char* fname = argv[3];
 
+	bool rawDisassemble = false;
+
 	if (argc > 4 && !strcmp(argv[4], "-d")) set_disassemble_exec();
+
+	else if (argc > 4 && !strcmp(argv[4], "-raw")) {
+		set_disassemble_exec();
+		set_disassemble_raw();
+		rawDisassemble = true;
+	}
 
 	char* _a;
 	int videoScale = (int)(strtol(videoScaleStr, &_a, 10));
@@ -18,6 +26,17 @@ int main(int argc, char** argv) {
 	chip_8 emulator;
 	ch_initialize(&emulator);
 	ch_loadRom(&emulator, fname);
+
+	if (rawDisassemble) {
+		int i = 0;
+
+		while (i < ch_numBytes()) {
+			ch_cycle(&emulator);
+			i+=2;
+		}
+
+		return 0;
+	}
 
 	ch_video platform;
 	initialize_video(&platform, fname, VIDEO_WIDTH*videoScale, VIDEO_HEIGHT*videoScale, VIDEO_WIDTH, VIDEO_HEIGHT);
@@ -39,6 +58,7 @@ int main(int argc, char** argv) {
 	}
 
 	deinit_video(&platform);
+	
 	return 0;
 
 

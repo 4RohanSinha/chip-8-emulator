@@ -11,7 +11,7 @@ const unsigned int START_ADDRESS = 0x200;
 const unsigned int FONTSET_SIZE = 80;
 const unsigned int FONTSET_START_ADDRESS = 0x50;
 
-static size_t rom_size = 0;
+size_t rom_size = 0;
 
 uint8_t fontset[FONTSET_SIZE] =
 {
@@ -92,4 +92,4 @@ void ch_cycle(chip_8* proc) {
 	if (proc->soundTimer > 0) --proc->soundTimer;
 }
 
-double ch_numInstructions() { return rom_size/2; }
+size_t ch_numBytes() { return rom_size; }

@@ -1,5 +1,6 @@
 #ifndef CHIP_8
 #define CHIP_8
+#include <stdlib.h>
 
 #ifndef NUM_REGISTERS
 #define NUM_REGISTERS 16
@@ -45,6 +46,6 @@ void ch_initialize(chip_8* proc);
 void ch_loadRom(chip_8* proc, char const* filename);
 void ch_cycle(chip_8* proc);
 unsigned char getRandomByte();
-double ch_numInstructions();
+size_t ch_numBytes();
 
 #endif
