@@ -11,14 +11,13 @@ int main(int argc, char** argv) {
 	char* _a;
 	int videoScale = (int)(strtol(videoScaleStr, &_a, 10));
 	int cycleDelay = (int)(strtol(cycleDelayStr, &_a, 10));
-	//printf("%i %i %s %s %s\n", videoScale, cycleDelay, argv[0], argv[1], fname);
 	
-	ch_video platform;
-	initialize_video(&platform, fname, VIDEO_WIDTH*videoScale, VIDEO_HEIGHT*videoScale, VIDEO_WIDTH, VIDEO_HEIGHT);
-
 	chip_8 emulator;
 	ch_initialize(&emulator);
 	ch_loadRom(&emulator, fname);
+
+	ch_video platform;
+	initialize_video(&platform, fname, VIDEO_WIDTH*videoScale, VIDEO_HEIGHT*videoScale, VIDEO_WIDTH, VIDEO_HEIGHT);
 
 	int videoPitch = sizeof(emulator.video[0]) * VIDEO_WIDTH;
 	struct timespec last_cycle;
