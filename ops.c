@@ -5,8 +5,8 @@
 #include <string.h>
 #include <stdarg.h>
 
-static bool disassemble_mode = false;
-void set_disassemble() { disassemble_mode = true; }
+static bool disassemble_mode_exec = false;
+void set_disassemble_exec() { disassemble_mode_exec = true; }
 #define PRINTI(format, ...) print_instruction(ch, format, ##__VA_ARGS__)
 
 void print_instruction(chip_8* ch, char* format, ...) {
@@ -20,27 +20,27 @@ void print_instruction(chip_8* ch, char* format, ...) {
 }
 
 INSTRUCTION(chop_00e0) {
-	if(disassemble_mode)
+	if(disassemble_mode_exec)
 		PRINTI("cls");
 	memset(ch->video, 0, sizeof(ch->video));
 }
 
 INSTRUCTION(chop_00ee) {
-	if(disassemble_mode)
+	if(disassemble_mode_exec)
 		PRINTI("ret");
 	ch->pc = ch->stack[--ch->sp];
 }
 
 INSTRUCTION(chop_1nnn) {
 	unsigned short address = ch->opcode & 0x0FFFu;
-	if(disassemble_mode)
+	if(disassemble_mode_exec)
 		PRINTI("jp 0x%x", address);
 	ch->pc = address;
 }
 
 INSTRUCTION(chop_2nnn) {
 	unsigned short address = ch->opcode & 0x0FFFu;
-	if(disassemble_mode)
+	if(disassemble_mode_exec)
 		PRINTI("call 0x%x", address);
 	ch->stack[ch->sp++] = ch->pc;
 	ch->pc = address;
@@ -49,7 +49,7 @@ INSTRUCTION(chop_2nnn) {
 INSTRUCTION(chop_3xkk) {
 	unsigned char r_id = (ch->opcode & 0x0F00u) >> 8u;
 	unsigned char kk = (ch->opcode & 0x00FFu);
-	if(disassemble_mode)
+	if(disassemble_mode_exec)
 		PRINTI("se V%d, %d", r_id, kk);
 	if (ch->registers[r_id] == kk) ch->pc += 2;
 }
@@ -57,7 +57,7 @@ INSTRUCTION(chop_3xkk) {
 INSTRUCTION(chop_4xkk) {
 	unsigned char r_id = (ch->opcode & 0x0F00u) >> 8u;
 	unsigned char kk = (ch->opcode & 0x00FFu);
-	if(disassemble_mode)
+	if(disassemble_mode_exec)
 		PRINTI("sne V%d, %d", r_id, kk);
 	if (ch->registers[r_id] != kk) ch->pc += 2;
 }
@@ -65,7 +65,7 @@ INSTRUCTION(chop_4xkk) {
 INSTRUCTION(chop_5xy0) {
 	unsigned char r_x = (ch->opcode & 0x0F00u) >> 8u;
 	unsigned char r_y = (ch->opcode & 0x00F0u) >> 4u;
-	if(disassemble_mode)
+	if(disassemble_mode_exec)
 		PRINTI("sne V%d, V%d", r_x, r_y);
 	if (ch->registers[r_x] == ch->registers[r_y]) ch->pc += 2;
 }
@@ -73,7 +73,7 @@ INSTRUCTION(chop_5xy0) {
 INSTRUCTION(chop_6xkk) {
 	unsigned char r_x = (ch->opcode & 0x0F00u) >> 8u;
 	unsigned char kk = ch->opcode & 0x00FFu;
-	if(disassemble_mode)
+	if(disassemble_mode_exec)
 		PRINTI("ld V%d, %d", r_x, kk);
 	ch->registers[r_x] = kk;
 }
@@ -81,7 +81,7 @@ INSTRUCTION(chop_6xkk) {
 INSTRUCTION(chop_7xkk) {
 	unsigned char r_x = (ch->opcode & 0x0F00u) >> 8u;
 	unsigned char kk = ch->opcode & 0x00FFu;
-	if(disassemble_mode)
+	if(disassemble_mode_exec)
 		PRINTI("add V%d, %d", r_x, kk);
 	ch->registers[r_x] += kk;
 }
@@ -89,7 +89,7 @@ INSTRUCTION(chop_7xkk) {
 INSTRUCTION(chop_8xy0) {
 	unsigned char r_x = (ch->opcode & 0x0F00u) >> 8u;
 	unsigned char r_y = (ch->opcode & 0x00F0u) >> 4u;
-	if(disassemble_mode)
+	if(disassemble_mode_exec)
 		PRINTI("ld V%d, V%d", r_x, r_y);
 	ch->registers[r_x] = ch->registers[r_y];
 }
@@ -97,7 +97,7 @@ INSTRUCTION(chop_8xy0) {
 INSTRUCTION(chop_8xy1) {
 	unsigned char r_x = (ch->opcode & 0x0F00u) >> 8u;
 	unsigned char r_y = (ch->opcode & 0x00F0u) >> 4u;
-	if(disassemble_mode)
+	if(disassemble_mode_exec)
 		PRINTI("or V%d, V%d", r_x, r_y);
 	ch->registers[r_x] |= ch->registers[r_y];
 }
@@ -105,7 +105,7 @@ INSTRUCTION(chop_8xy1) {
 INSTRUCTION(chop_8xy2) {
 	unsigned char r_x = (ch->opcode & 0x0F00u) >> 8u;
 	unsigned char r_y = (ch->opcode & 0x00F0u) >> 4u;
-	if(disassemble_mode)
+	if(disassemble_mode_exec)
 		PRINTI("and V%d, V%d", r_x, r_y);
 	ch->registers[r_x] &= ch->registers[r_y];
 }
@@ -113,7 +113,7 @@ INSTRUCTION(chop_8xy2) {
 INSTRUCTION(chop_8xy3) {
 	unsigned char r_x = (ch->opcode & 0x0F00u) >> 8u;
 	unsigned char r_y = (ch->opcode & 0x00F0u) >> 4u;
-	if(disassemble_mode)
+	if(disassemble_mode_exec)
 		PRINTI("xor V%d, V%d", r_x, r_y);
 	ch->registers[r_x] ^= ch->registers[r_y];
 }
@@ -123,7 +123,7 @@ INSTRUCTION(chop_8xy4) {
 	unsigned char r_y = (ch->opcode & 0x00F0u) >> 4u;
 
 	unsigned short sum = ch->registers[r_x] + ch->registers[r_y];
-	if(disassemble_mode)
+	if(disassemble_mode_exec)
 		PRINTI("add V%d, V%d", r_x, r_y);
 	if (sum > 255U) ch->registers[0xF] = 1;
 	else ch->registers[0xF] = 0;
@@ -135,7 +135,7 @@ INSTRUCTION(chop_8xy5) {
 	unsigned char r_x = (ch->opcode & 0x0F00u) >> 8u;
 	unsigned char r_y = (ch->opcode & 0x00F0u) >> 4u;
 
-	if(disassemble_mode)
+	if(disassemble_mode_exec)
 		PRINTI("sub V%d, V%d", r_x, r_y);
 	if (ch->registers[r_x] > ch->registers[r_y]) ch->registers[0xf] = 1;
 	else ch->registers[0xf] = 0;
@@ -145,7 +145,7 @@ INSTRUCTION(chop_8xy5) {
 
 INSTRUCTION(chop_8xy6) {
 	unsigned char r_x = (ch->opcode & 0x0F00u) >> 8u;
-	if(disassemble_mode)
+	if(disassemble_mode_exec)
 		PRINTI("shr V%d", r_x);
 	ch->registers[0xf] = ch->registers[r_x] & 0x1u;
 	ch->registers[r_x] >>= 1;
@@ -155,7 +155,7 @@ INSTRUCTION(chop_8xy7) {
 	unsigned char r_x = (ch->opcode & 0x0F00u) >> 8u;
 	unsigned char r_y = (ch->opcode & 0x00F0u) >> 4u;
 
-	if(disassemble_mode)
+	if(disassemble_mode_exec)
 		PRINTI("subn V%d, V%d", r_x, r_y);
 	if (ch->registers[r_x] < ch->registers[r_y]) ch->registers[0xf] = 1;
 	else ch->registers[0xf] = 0;
@@ -165,7 +165,7 @@ INSTRUCTION(chop_8xy7) {
 
 INSTRUCTION(chop_8xye) {
 	unsigned char r_x = (ch->opcode & 0x0F00u) >> 8u;
-	if(disassemble_mode)
+	if(disassemble_mode_exec)
 		PRINTI("shl V%d", r_x);
 	ch->registers[0xf] = (ch->registers[r_x] & 0x80u) >> 7;
 	ch->registers[r_x] <<= 1;
@@ -174,21 +174,21 @@ INSTRUCTION(chop_8xye) {
 INSTRUCTION(chop_9xy0) {
 	unsigned char r_x = (ch->opcode & 0x0F00u) >> 8u;
 	unsigned char r_y = (ch->opcode & 0x00F0u) >> 4u;
-	if(disassemble_mode)
+	if(disassemble_mode_exec)
 		PRINTI("sne V%d, V%d", r_x, r_y);
 	if (ch->registers[r_x] != ch->registers[r_y]) ch->pc += 2;
 }
 
 INSTRUCTION(chop_Annn) {
 	unsigned short address = (ch->opcode & 0x0FFFu);
-	if(disassemble_mode)
+	if(disassemble_mode_exec)
 		PRINTI("ld I, 0x%x", address);
 	ch->index = address;
 }
 
 INSTRUCTION(chop_Bnnn) {
 	unsigned short address = (ch->opcode & 0x0FFFu);
-	if(disassemble_mode)
+	if(disassemble_mode_exec)
 		PRINTI("jp V0, 0x%x", address);
 	ch->pc = ch->registers[0] + address;
 }
@@ -196,7 +196,7 @@ INSTRUCTION(chop_Bnnn) {
 INSTRUCTION(chop_Cxkk) {
 	unsigned char kk = (ch->opcode & 0x00FFu);
 	unsigned char r_x = (ch->opcode & 0x0F00u) >> 8;
-	if(disassemble_mode)
+	if(disassemble_mode_exec)
 		PRINTI("rnd V%d, %d", r_x, kk);
 	ch->registers[r_x] = getRandomByte() && kk;
 }
@@ -205,7 +205,7 @@ INSTRUCTION(chop_Dxyn) {
 	unsigned char r_x = (ch->opcode & 0x0F00u) >> 8;
 	unsigned char r_y = (ch->opcode & 0x00F0u) >> 4;
 	unsigned char height = (ch->opcode & 0x000Fu);
-	if(disassemble_mode)
+	if(disassemble_mode_exec)
 		PRINTI("drw V%d, V%d, %d", r_x, r_y, height);
 	unsigned char xPos = ch->registers[r_x] % VIDEO_WIDTH;
 	unsigned char yPos = ch->registers[r_y] % VIDEO_HEIGHT;
@@ -230,7 +230,7 @@ INSTRUCTION(chop_Dxyn) {
 INSTRUCTION(chop_Ex9E) {
 	unsigned char r_x = (ch->opcode & 0x0F00u) >> 8;
 	unsigned char key = ch->registers[r_x];
-	if(disassemble_mode)
+	if(disassemble_mode_exec)
 		PRINTI("skp V%d", r_x);
 	if (ch->keypad[key]) ch->pc += 2;
 }
@@ -238,21 +238,21 @@ INSTRUCTION(chop_Ex9E) {
 INSTRUCTION(chop_ExA1) {
 	unsigned char r_x = (ch->opcode & 0x0F00u) >> 8;
 	unsigned char key = ch->registers[r_x];
-	if(disassemble_mode)
+	if(disassemble_mode_exec)
 		PRINTI("sknp V%d", r_x);
 	if (!ch->keypad[key]) ch->pc += 2;
 }
 
 INSTRUCTION(chop_Fx07) {
 	unsigned char r_x = (ch->opcode & 0x0F00u) >> 8;
-	if(disassemble_mode)
+	if(disassemble_mode_exec)
 		PRINTI("ld V%d, dt", r_x);
 	ch->registers[r_x] = ch->delayTimer;
 }
 
 INSTRUCTION(chop_Fx0A) {
 	unsigned char r_x = (ch->opcode & 0x0F00u) >> 8;
-	if(disassemble_mode)
+	if(disassemble_mode_exec)
 		PRINTI("ld V%d, K", r_x);
 	bool keyPressed = false;
 	for (int i = 0; i < 16; i++) {
@@ -267,21 +267,21 @@ INSTRUCTION(chop_Fx0A) {
 
 INSTRUCTION(chop_Fx15) {
 	unsigned char r_x = (ch->opcode & 0x0F00u) >> 8;
-	if(disassemble_mode)
+	if(disassemble_mode_exec)
 		PRINTI("ld DT, V%d", r_x);
 	ch->delayTimer = ch->registers[r_x];
 }
 
 INSTRUCTION(chop_Fx18) {
 	unsigned char r_x = (ch->opcode & 0x0F00u) >> 8;
-	if(disassemble_mode)
+	if(disassemble_mode_exec)
 		PRINTI("ld ST, V%d", r_x);
 	ch->soundTimer = ch->registers[r_x];
 }
 
 INSTRUCTION(chop_Fx1E) {
 	unsigned char r_x = (ch->opcode & 0x0F00u) >> 8;
-	if(disassemble_mode)
+	if(disassemble_mode_exec)
 		PRINTI("add I, V%d", r_x);
 	ch->index += ch->registers[r_x];
 }
@@ -289,7 +289,7 @@ INSTRUCTION(chop_Fx1E) {
 INSTRUCTION(chop_Fx29) {
 	unsigned char r_x = (ch->opcode & 0x0F00u) >> 8;
 	unsigned char digit = ch->registers[r_x];
-	if(disassemble_mode)
+	if(disassemble_mode_exec)
 		PRINTI("ld F, V%d", r_x);
 	ch->index = FONTSET_START_ADDRESS + (5*digit);
 }
@@ -297,7 +297,7 @@ INSTRUCTION(chop_Fx29) {
 INSTRUCTION(chop_Fx33) {
 	unsigned char r_x = (ch->opcode & 0x0F00u) >> 8;
 	unsigned char val = ch->registers[r_x];
-	if(disassemble_mode)
+	if(disassemble_mode_exec)
 		PRINTI("ld B, V%d", r_x);
 	ch->memory[ch->index + 2] = val % 10;
 	val /= 10;
@@ -310,14 +310,14 @@ INSTRUCTION(chop_Fx33) {
 
 INSTRUCTION(chop_Fx55) {
 	unsigned char r_x = (ch->opcode & 0x0F00u) >> 8;
-	if(disassemble_mode)
+	if(disassemble_mode_exec)
 		PRINTI("ld [I], V%d", r_x);
 	memcpy(ch->memory + ch->index, ch->registers, r_x+1);
 }
 
 INSTRUCTION(chop_Fx65) {
 	unsigned char r_x = (ch->opcode & 0x0F00u) >> 8;
-	if(disassemble_mode)
+	if(disassemble_mode_exec)
 		PRINTI("ld V%d, [I]", r_x);
 	memcpy(ch->registers, ch->memory + ch->index, r_x+1);
 }
