@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "ops.h"
 #include "video.h"
 #include "chip8.h"
 #include <time.h>
@@ -7,6 +8,8 @@ int main(int argc, char** argv) {
 	const char* videoScaleStr = argv[1];
 	const char* cycleDelayStr = argv[2];
 	const char* fname = argv[3];
+
+	if (argc > 4 && !strcmp(argv[4], "-d")) set_disassemble();
 
 	char* _a;
 	int videoScale = (int)(strtol(videoScaleStr, &_a, 10));

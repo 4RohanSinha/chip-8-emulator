@@ -3,6 +3,8 @@
 
 typedef struct chip_8 chip_8;
 
+void set_disassemble();
+void print_instruction(chip_8*, char*, ...);
 #define INSTRUCTION(instr) void instr(chip_8* ch)
 
 INSTRUCTION(chop_00e0); //cls

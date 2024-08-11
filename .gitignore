@@ -3,3 +3,5 @@
 *.ch8
 *.o
 chip8
+*.asm
+*.i

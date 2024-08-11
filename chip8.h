@@ -1,13 +1,29 @@
 #ifndef CHIP_8
 #define CHIP_8
 
+#ifndef NUM_REGISTERS
 #define NUM_REGISTERS 16
+#endif
+
+#ifndef MEM_SIZE
 #define MEM_SIZE 4096
+#endif
+
+#ifndef STACK_SIZE
 #define STACK_SIZE 16
+#endif
+
 #define KEYPAD_SIZE 16
-#define VIDEO_SIZE 64 * 32
+
+#ifndef VIDEO_WIDTH
 #define VIDEO_WIDTH 64
+#endif
+
+#ifndef VIDEO_HEIGHT
 #define VIDEO_HEIGHT 32
+#endif
+
+#define VIDEO_SIZE VIDEO_WIDTH * VIDEO_HEIGHT
 
 extern const unsigned int FONTSET_START_ADDRESS;
 
@@ -29,5 +45,6 @@ void ch_initialize(chip_8* proc);
 void ch_loadRom(chip_8* proc, char const* filename);
 void ch_cycle(chip_8* proc);
 unsigned char getRandomByte();
+double ch_numInstructions();
 
 #endif

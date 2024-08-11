@@ -11,6 +11,8 @@ const unsigned int START_ADDRESS = 0x200;
 const unsigned int FONTSET_SIZE = 80;
 const unsigned int FONTSET_START_ADDRESS = 0x50;
 
+static size_t rom_size = 0;
+
 uint8_t fontset[FONTSET_SIZE] =
 {
 	0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
@@ -55,9 +57,24 @@ unsigned char getRandomByte() {
 
 void ch_loadRom(chip_8* proc, char const* filename) {
 	FILE* rom = fopen(filename, "rb");
-
+	long startPos, endPos;
 	if (!feof(rom)) {
+		startPos = ftell(rom);
+		if (startPos == -1) {
+			printf("Processing error\n");
+			exit(1);
+		}
+
 		fread(proc->memory + START_ADDRESS, MEM_SIZE - START_ADDRESS, 1, rom);
+
+		endPos = ftell(rom);
+
+		if (endPos == -1) {
+			printf("Processing error\n");
+			exit(1);
+		}
+
+		rom_size = endPos - startPos;
 	}
 
 	fclose(rom);
@@ -74,3 +91,5 @@ void ch_cycle(chip_8* proc) {
 
 	if (proc->soundTimer > 0) --proc->soundTimer;
 }
+
+double ch_numInstructions() { return rom_size/2; }
