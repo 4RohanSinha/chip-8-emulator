@@ -6,3 +6,6 @@ chip8
 *.asm
 *.i
 *.s
+*.py
+*.bin
+*.hex

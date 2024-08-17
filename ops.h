@@ -54,7 +54,7 @@ void (*table[16])(chip_8*);
 void (*table0[16])(chip_8*);
 void (*table8[16])(chip_8*);
 void (*tablee[16])(chip_8*);
-void (*tablef[102])(chip_8*);
+void (*tablef[200])(chip_8*);
 
 void initialize_optable();
 

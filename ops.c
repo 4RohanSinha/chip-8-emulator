@@ -74,7 +74,7 @@ INSTRUCTION(chop_5xy0) {
 	unsigned char r_x = (ch->opcode & 0x0F00u) >> 8u;
 	unsigned char r_y = (ch->opcode & 0x00F0u) >> 4u;
 	if(disassemble_mode_exec)
-		PRINTI("sne V%d, V%d", r_x, r_y);
+		PRINTI("se V%d, V%d", r_x, r_y);
 	if (disassemble_raw) return;
 	if (ch->registers[r_x] == ch->registers[r_y]) ch->pc += 2;
 }
@@ -358,6 +358,86 @@ INSTRUCTION(chop_Fx65) {
 	memcpy(ch->registers, ch->memory + ch->index, r_x+1);
 }
 
+//DEBUGGING INSTRUCTIONS - not in the standard:
+// Fx95 - printdb <reg - Vx>
+	//prints value of register
+// 00EA - prints index address - prints I
+// 00EB - prints value at index - prints [I]
+// 00EC - prints string at index
+	//follows addr and treats it as THE START OF A STRING - will keep printing each byte as a character until zero byte, as usual
+// Fx97 - prints N rows - display of 1/0 bits starting at I
+// 8kka - printb <byte - kk>
+	//prints byte kk
+
+INSTRUCTION(chdb_00ea) {
+	unsigned short index = ch->index;
+	if (disassemble_mode_exec)
+		PRINTI("printdb I");
+	if (disassemble_raw) return;
+	printf("Chip 8 Debugging Console: %x\n", index);
+}
+
+INSTRUCTION(chdb_00eb) {
+	unsigned char ind_val = ch->memory[ch->index];
+	if (disassemble_mode_exec)
+		PRINTI("printdb [I]");
+	if (disassemble_raw) return;
+	printf("Chip 8 Debugging Console: %c\n", ind_val);
+
+}
+
+INSTRUCTION(chdb_00ec) {
+	unsigned short addr = ch->index;
+
+	if (disassemble_mode_exec)
+		PRINTI("prints 0x%x", addr);
+	if (disassemble_raw) return;
+	printf("Chip 8 Debugging Console: %s\n", ch->memory+addr);
+
+}
+
+INSTRUCTION(chdb_8kka) {
+	unsigned char byte = (ch->opcode & 0x0FF0) >> 4;
+	if (disassemble_mode_exec)
+		PRINTI("printdb 0x%x", byte);
+	if (disassemble_raw) return;
+	printf("Chip 8 Debugging Console: %c\n", byte);
+}
+
+INSTRUCTION(chdb_Fx95) {
+	unsigned char r_x = (ch->opcode & 0x0F00u) >> 8;
+
+	if (disassemble_mode_exec)
+		PRINTI("printdb V%d", r_x);
+	if (disassemble_raw) return;
+	printf("Chip 8 Debugging Console: %d\n",ch->registers[r_x]);
+}
+
+static void print_bin(unsigned char byte)
+{
+    int i = 8;
+    while (i--) {
+	printf("%c", '0'+((byte >> i) & 1));
+    }
+}
+
+INSTRUCTION(chdb_Fx97) {
+	unsigned char num_rows = (ch->opcode & 0x0F00u) >> 8;
+	int i = 0;
+
+	if (disassemble_mode_exec)
+		PRINTI("prdrw I, %d", num_rows);
+	if (disassemble_raw) return;
+	printf("Chip 8 Debugging Console:\n");
+	while (i < num_rows*2) {
+		print_bin(ch->memory[ch->index+i]);
+		i++;
+		if (i % 2 == 0) printf("\n");
+	}
+
+}
+
+
 INSTRUCTION(chop_NOP) {
 	if (disassemble_mode_exec)
 		PRINTI("?? ?? ??");
@@ -387,10 +467,15 @@ void initialize_optable() {
 		tablee[i] = chop_NOP;
 	}
 
-	for (int i = 0; i < 102; i++) tablef[i] = chop_NOP;
+	for (int i = 0; i < 200; i++) tablef[i] = chop_NOP;
 
 	table0[0] = chop_00e0;
 	table0[0xe] = chop_00ee;
+
+	table0[0xa] = chdb_00ea;
+	table0[0xb] = chdb_00eb;
+	table0[0xc] = chdb_00ec;
+//	table0[0xd] = chdb_00ed;
 
 	table8[0] = chop_8xy0;
 	table8[1] = chop_8xy1;
@@ -401,6 +486,8 @@ void initialize_optable() {
 	table8[6] = chop_8xy6;
 	table8[7] = chop_8xy7;
 	table8[0xe] = chop_8xye;
+
+	table8[0xa] = chdb_8kka;
 
 	tablee[0x1] = chop_ExA1;
 	tablee[0xe] = chop_Ex9E;
@@ -414,6 +501,9 @@ void initialize_optable() {
 	tablef[0x33] = chop_Fx33;
 	tablef[0x55] = chop_Fx55;
 	tablef[0x65] = chop_Fx65;
+
+	tablef[0x95] = chdb_Fx95;
+	tablef[0x97] = chdb_Fx97;
 }
 
 void table0f(chip_8* ch) {
@@ -436,7 +526,7 @@ void tableef(chip_8* ch) {
 
 void tableff(chip_8* ch) {
 	int index = ch->opcode & 0x00FFu;
-	if (index < 102) (tablef[index])(ch);
+	if (index < 200) (tablef[index])(ch);
 	else chop_NOP(ch);
 }
 
