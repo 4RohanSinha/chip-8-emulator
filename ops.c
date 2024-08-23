@@ -390,7 +390,7 @@ INSTRUCTION(chdb_00ec) {
 	unsigned short addr = ch->index;
 
 	if (disassemble_mode_exec)
-		PRINTI("prints 0x%x", addr);
+		PRINTI("prints I", addr);
 	if (disassemble_raw) return;
 	printf("Chip 8 Debugging Console: %s\n", ch->memory+addr);
 
